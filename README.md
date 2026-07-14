@@ -1,4 +1,4 @@
-# FontReplacerMod
+# FallBackFontMod
 
 這是一款為 **Schedule I** 開發的 [MelonLoader](https://www.google.com/search?q=https://github.com/LavaGang/MelonLoader) 模組（Mod），可將你的自定義字體追加為備用字體（Fallback），讓遊戲在遇到缺字時自動動態生成所需的字形。
 
