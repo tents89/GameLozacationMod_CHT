@@ -10,9 +10,9 @@ public class FontPatcher
 {
     private readonly MelonLogger.Instance _logger;
     private TMP_FontAsset _customFontAsset;
-    private TMP_FontAsset _originalDefaultFont;
     private string _fontFolderPath;
     private bool _initialized;
+    private readonly HashSet<int> _patchedFontIds = new();
 
     public FontPatcher(MelonLogger.Instance logger)
     {
@@ -67,32 +67,25 @@ public class FontPatcher
 
     private void LoadAndCreateFontAsset(string fontFilePath)
     {
-        // In IL2CPP, Font(string) constructor doesn't exist.
-        // Use the file-path overload of TMP_FontAsset.CreateFontAsset directly.
         _customFontAsset = TMP_FontAsset.CreateFontAsset(
             fontFilePath,
-            0,                                          // faceIndex
-            44,                                         // samplingPointSize
-            4,                                          // atlasPadding
-            UnityEngine.TextCore.LowLevel.GlyphRenderMode.SDFAA, // renderMode
-            4096,                                       // atlasWidth
-            4096,                                       // atlasHeight
-            AtlasPopulationMode.Dynamic,                // dynamic glyph population
-            true                                        // enableMultiAtlasSupport
+            0,
+            44,
+            4,
+            UnityEngine.TextCore.LowLevel.GlyphRenderMode.SDFAA,
+            4096,
+            4096,
+            AtlasPopulationMode.Dynamic,
+            true
         );
 
         if (_customFontAsset == null)
-        {
             throw new Exception("TMP_FontAsset.CreateFontAsset returned null");
-        }
 
         _customFontAsset.name = "CustomFont_" + Path.GetFileNameWithoutExtension(fontFilePath);
-
-        // Hide the asset from Unity's garbage collection
         _customFontAsset.hideFlags = HideFlags.DontUnloadUnusedAsset;
 
         _logger.Msg($"Created TMP_FontAsset: {_customFontAsset.name}");
-        _logger.Msg($"Atlas size: {_customFontAsset.atlasWidth}x{_customFontAsset.atlasHeight}");
     }
 
     public void OnSceneLoaded()
@@ -102,127 +95,74 @@ public class FontPatcher
 
         try
         {
-            ReplaceGlobalDefault();
-            ReplaceAllTextComponents();
+            InjectFallbackToAllFonts();
         }
         catch (Exception ex)
         {
-            _logger.Error($"Failed to replace fonts in scene: {ex}");
+            _logger.Error($"Failed to inject fallback fonts: {ex}");
         }
     }
 
-    private void ReplaceGlobalDefault()
+    private void InjectFallbackToAllFonts()
     {
-        var settings = TMP_Settings.instance;
-        if (settings == null)
-        {
-            _logger.Warning("TMP_Settings.instance is null, skipping global default replacement");
-            return;
-        }
+        int injectedCount = 0;
 
-        if (_originalDefaultFont == null)
+        // Find every TMP_FontAsset loaded in the game
+        var allFontAssets = Resources.FindObjectsOfTypeAll(Il2CppType.Of<TMP_FontAsset>());
+        foreach (var obj in allFontAssets)
         {
-            _originalDefaultFont = TMP_Settings.defaultFontAsset;
-            if (_originalDefaultFont != null)
+            var fontAsset = obj.Cast<TMP_FontAsset>();
+            if (fontAsset == null) continue;
+
+            // Don't add fallback to our own custom font
+            if (fontAsset.name == _customFontAsset.name) continue;
+
+            int id = fontAsset.GetInstanceID();
+            if (_patchedFontIds.Contains(id)) continue;
+
+            // Inject custom font into this font's fallback table
+            if (fontAsset.fallbackFontAssetTable == null)
+                fontAsset.fallbackFontAssetTable = new Il2CppSystem.Collections.Generic.List<TMP_FontAsset>();
+
+            // Check not already present
+            bool alreadyPresent = false;
+            for (int i = 0; i < fontAsset.fallbackFontAssetTable.Count; i++)
             {
-                _logger.Msg($"Original default font: {_originalDefaultFont.name}");
-
-                // Add original font as fallback so missing glyphs still render
-                if (_customFontAsset.fallbackFontAssetTable == null)
+                var entry = fontAsset.fallbackFontAssetTable[i];
+                if (entry != null && entry.name == _customFontAsset.name)
                 {
-                    _customFontAsset.fallbackFontAssetTable = new Il2CppSystem.Collections.Generic.List<TMP_FontAsset>();
+                    alreadyPresent = true;
+                    break;
                 }
-                _customFontAsset.fallbackFontAssetTable.Add(_originalDefaultFont);
             }
+
+            if (!alreadyPresent)
+            {
+                fontAsset.fallbackFontAssetTable.Insert(0, _customFontAsset);
+                injectedCount++;
+            }
+
+            _patchedFontIds.Add(id);
         }
 
-        TMP_Settings.defaultFontAsset = _customFontAsset;
-
-        // Also add to global fallback list
+        // Also inject into TMP_Settings global fallback list
         var globalFallbacks = TMP_Settings.fallbackFontAssets;
         if (globalFallbacks != null)
         {
-            bool alreadyAdded = false;
+            bool found = false;
             for (int i = 0; i < globalFallbacks.Count; i++)
             {
                 if (globalFallbacks[i] != null && globalFallbacks[i].name == _customFontAsset.name)
                 {
-                    alreadyAdded = true;
+                    found = true;
                     break;
                 }
             }
-            if (!alreadyAdded)
-            {
+            if (!found)
                 globalFallbacks.Insert(0, _customFontAsset);
-            }
         }
 
-        _logger.Msg("Global default font replaced.");
-    }
-
-    private void ReplaceAllTextComponents()
-    {
-        int replacedCount = 0;
-
-        // Find all TextMeshProUGUI components (UI text)
-        var uguiTexts = Resources.FindObjectsOfTypeAll(Il2CppType.Of<TextMeshProUGUI>());
-        foreach (var obj in uguiTexts)
-        {
-            var tmpText = obj.Cast<TextMeshProUGUI>();
-            if (tmpText == null) continue;
-
-            var currentFont = tmpText.font;
-            if (currentFont != null && currentFont.name == _customFontAsset.name)
-                continue;
-
-            // Store original font as fallback if not already in the list
-            if (currentFont != null && currentFont.name != _customFontAsset.name)
-            {
-                AddFallbackIfMissing(currentFont);
-            }
-
-            tmpText.font = _customFontAsset;
-            replacedCount++;
-        }
-
-        // Find all TextMeshPro components (3D world text)
-        var worldTexts = Resources.FindObjectsOfTypeAll(Il2CppType.Of<TextMeshPro>());
-        foreach (var obj in worldTexts)
-        {
-            var tmpText = obj.Cast<TextMeshPro>();
-            if (tmpText == null) continue;
-
-            var currentFont = tmpText.font;
-            if (currentFont != null && currentFont.name == _customFontAsset.name)
-                continue;
-
-            if (currentFont != null && currentFont.name != _customFontAsset.name)
-            {
-                AddFallbackIfMissing(currentFont);
-            }
-
-            tmpText.font = _customFontAsset;
-            replacedCount++;
-        }
-
-        if (replacedCount > 0)
-            _logger.Msg($"Replaced font on {replacedCount} text component(s).");
-    }
-
-    private void AddFallbackIfMissing(TMP_FontAsset fontAsset)
-    {
-        if (_customFontAsset.fallbackFontAssetTable == null)
-        {
-            _customFontAsset.fallbackFontAssetTable = new Il2CppSystem.Collections.Generic.List<TMP_FontAsset>();
-        }
-
-        for (int i = 0; i < _customFontAsset.fallbackFontAssetTable.Count; i++)
-        {
-            if (_customFontAsset.fallbackFontAssetTable[i] != null &&
-                _customFontAsset.fallbackFontAssetTable[i].name == fontAsset.name)
-                return;
-        }
-
-        _customFontAsset.fallbackFontAssetTable.Add(fontAsset);
+        if (injectedCount > 0)
+            _logger.Msg($"Injected custom font as fallback into {injectedCount} font asset(s).");
     }
 }
