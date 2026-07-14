@@ -53,11 +53,9 @@ dotnet build -c Release -p:GameDir="D:\SteamLibrary\steamapps\common\Schedule I\
 
 ## 使用方法
 
-1. 在安裝好 MelonLoader 的情況下啟動一次遊戲（以生成代理組件 Proxy Assemblies）。
+1. 在安裝好 MelonLoader 的情況下啟動一次遊戲
 2. 將你的 `.ttf` 或 `.otf` 字體檔案放入 `<Schedule I>/UserData/FontReplacer/` 資料夾中。
-3. 啟動遊戲 —— 模組會自動將該字體載入並設為全域備用字體。當遊戲遇到原版字體不支援的字元時，會自動由你的字體進行動態渲染。
-
-你可以查看 MelonLoader 主控台（Console）以確認狀態訊息。
+3. 啟動遊戲 —— 模組會自動將該字體載入並設為全域備用字體。當遊戲遇到原版字體不支援的字元時，會自動由你的字體進行動態渲染。(主要用於CJK使用者)
 
 ## 授權條款
 
