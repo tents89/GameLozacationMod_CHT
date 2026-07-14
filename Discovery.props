@@ -1,0 +1,81 @@
+<Project>
+  <!-- Schedule I (Steam App 3164500) + MelonLoader path auto-detection
+       Priority: manual override > registry > default Steam path > multi-drive SteamLibrary scan > relative to .csproj
+       Override via command line: -p:GameDir=D:\Games\Schedule I -->
+
+  <PropertyGroup>
+    <_GameExeName>Schedule I.exe</_GameExeName>
+    <_GameFolderName>Schedule I</_GameFolderName>
+    <_SteamAppId>3164500</_SteamAppId>
+  </PropertyGroup>
+
+  <!-- ===== Windows ===== -->
+  <PropertyGroup Condition="!$([MSBuild]::IsOSPlatform('Linux')) And !$([MSBuild]::IsOSPlatform('OSX'))">
+    <!-- Method 1: Get game install path directly from registry -->
+    <_RegistryGamePath>$([MSBuild]::GetRegistryValueFromView('HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Steam App $(_SteamAppId)', 'InstallLocation', '', RegistryView.Registry64, RegistryView.Registry32))</_RegistryGamePath>
+
+    <!-- Method 2: Get Steam root directory from registry -->
+    <_SteamPath>$(registry:HKEY_CURRENT_USER\Software\Valve\Steam@SteamPath)</_SteamPath>
+    <_DefaultSteamApps Condition="'$(_SteamPath)' != ''">$(_SteamPath)/steamapps</_DefaultSteamApps>
+    <_DefaultSteamApps Condition="'$(_DefaultSteamApps)' == ''">C:/Program Files (x86)/Steam/steamapps</_DefaultSteamApps>
+  </PropertyGroup>
+
+  <!-- ===== Linux ===== -->
+  <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('Linux'))">
+    <_DefaultSteamApps>$(HOME)/.local/share/Steam/steamapps</_DefaultSteamApps>
+  </PropertyGroup>
+
+  <!-- ===== macOS (Not used by this project, may have errors) ===== -->
+  <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('OSX'))">
+    <_DefaultSteamApps>$(HOME)/Library/Application Support/Steam/steamapps</_DefaultSteamApps>
+  </PropertyGroup>
+
+  <!-- ===== GameDir resolution (cascading fallback) ===== -->
+  <PropertyGroup>
+    <!-- 1. User manual override (-p:GameDir=...) takes highest priority -->
+
+    <!-- 2. Windows registry direct match -->
+    <GameDir Condition="'$(GameDir)' == '' And '$(_RegistryGamePath)' != '' And Exists('$(_RegistryGamePath)\$(_GameExeName)')">$(_RegistryGamePath)\</GameDir>
+
+    <!-- 3. Default Steam library path -->
+    <GameDir Condition="'$(GameDir)' == '' And Exists('$(_DefaultSteamApps)/common/$(_GameFolderName)/$(_GameExeName)')">$(_DefaultSteamApps)/common/$(_GameFolderName)/</GameDir>
+
+    <!-- 4. Scan common drive letters for SteamLibrary (Windows multi-library installs) -->
+    <GameDir Condition="'$(GameDir)' == '' And Exists('C:\SteamLibrary\steamapps\common\$(_GameFolderName)\$(_GameExeName)')">C:\SteamLibrary\steamapps\common\$(_GameFolderName)\</GameDir>
+    <GameDir Condition="'$(GameDir)' == '' And Exists('D:\SteamLibrary\steamapps\common\$(_GameFolderName)\$(_GameExeName)')">D:\SteamLibrary\steamapps\common\$(_GameFolderName)\</GameDir>
+    <GameDir Condition="'$(GameDir)' == '' And Exists('E:\SteamLibrary\steamapps\common\$(_GameFolderName)\$(_GameExeName)')">E:\SteamLibrary\steamapps\common\$(_GameFolderName)\</GameDir>
+    <GameDir Condition="'$(GameDir)' == '' And Exists('F:\SteamLibrary\steamapps\common\$(_GameFolderName)\$(_GameExeName)')">F:\SteamLibrary\steamapps\common\$(_GameFolderName)\</GameDir>
+    <GameDir Condition="'$(GameDir)' == '' And Exists('G:\SteamLibrary\steamapps\common\$(_GameFolderName)\$(_GameExeName)')">G:\SteamLibrary\steamapps\common\$(_GameFolderName)\</GameDir>
+    <GameDir Condition="'$(GameDir)' == '' And Exists('H:\SteamLibrary\steamapps\common\$(_GameFolderName)\$(_GameExeName)')">H:\SteamLibrary\steamapps\common\$(_GameFolderName)\</GameDir>
+    <GameDir Condition="'$(GameDir)' == '' And Exists('I:\SteamLibrary\steamapps\common\$(_GameFolderName)\$(_GameExeName)')">I:\SteamLibrary\steamapps\common\$(_GameFolderName)\</GameDir>
+
+    <!-- Also check Steam installs at drive root (e.g. E:\STEAM\steamapps) -->
+    <GameDir Condition="'$(GameDir)' == '' And Exists('C:\Steam\steamapps\common\$(_GameFolderName)\$(_GameExeName)')">C:\Steam\steamapps\common\$(_GameFolderName)\</GameDir>
+    <GameDir Condition="'$(GameDir)' == '' And Exists('D:\Steam\steamapps\common\$(_GameFolderName)\$(_GameExeName)')">D:\Steam\steamapps\common\$(_GameFolderName)\</GameDir>
+    <GameDir Condition="'$(GameDir)' == '' And Exists('E:\Steam\steamapps\common\$(_GameFolderName)\$(_GameExeName)')">E:\Steam\steamapps\common\$(_GameFolderName)\</GameDir>
+    <GameDir Condition="'$(GameDir)' == '' And Exists('F:\Steam\steamapps\common\$(_GameFolderName)\$(_GameExeName)')">F:\Steam\steamapps\common\$(_GameFolderName)\</GameDir>
+    <GameDir Condition="'$(GameDir)' == '' And Exists('G:\Steam\steamapps\common\$(_GameFolderName)\$(_GameExeName)')">G:\Steam\steamapps\common\$(_GameFolderName)\</GameDir>
+    <GameDir Condition="'$(GameDir)' == '' And Exists('H:\Steam\steamapps\common\$(_GameFolderName)\$(_GameExeName)')">H:\Steam\steamapps\common\$(_GameFolderName)\</GameDir>
+    <GameDir Condition="'$(GameDir)' == '' And Exists('I:\Steam\steamapps\common\$(_GameFolderName)\$(_GameExeName)')">I:\Steam\steamapps\common\$(_GameFolderName)\</GameDir>
+
+    <!-- 5. Infer from .csproj location (when project is inside the game directory) -->
+    <GameDir Condition="'$(GameDir)' == '' And Exists('$([System.IO.Path]::GetFullPath(&quot;$(MSBuildProjectDirectory)/../../$(_GameExeName)&quot;))')">$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)/../../'))</GameDir>
+  </PropertyGroup>
+
+  <!-- ===== Derived paths (MelonLoader specific) ===== -->
+  <PropertyGroup>
+    <MelonLoaderDir>$(GameDir)MelonLoader/</MelonLoaderDir>
+    <MelonLoaderNet6Dir>$(MelonLoaderDir)net6/</MelonLoaderNet6Dir>
+    <Il2CppAssembliesDir>$(MelonLoaderDir)Il2CppAssemblies/</Il2CppAssembliesDir>
+    <ModsDir>$(GameDir)Mods/</ModsDir>
+  </PropertyGroup>
+
+  <!-- ===== Error if game directory not found ===== -->
+  <Target Name="_ValidateGameDir" BeforeTargets="ResolveAssemblyReferences">
+    <Error Condition="'$(GameDir)' == '' Or !Exists('$(GameDir)')"
+           Text="Could not find Schedule I install path. Please specify the game root directory manually with -p:GameDir=&lt;path&gt;." />
+    <Error Condition="!Exists('$(Il2CppAssembliesDir)')"
+           Text="Could not find Il2CppAssemblies folder ($(Il2CppAssembliesDir)). Please launch the game with MelonLoader at least once to generate proxy assemblies." />
+    <Message Importance="high" Text="Schedule I: $(GameDir)" />
+  </Target>
+</Project>
