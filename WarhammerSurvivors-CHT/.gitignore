@@ -1,0 +1,45 @@
+# Build outputs and local SDK/package state
+**/bin/
+**/obj/
+.packages/
+.dotnet/
+.python-tools/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# Local releases, backups, reports and extracted game text
+dist/
+archive/
+artifacts/
+_cache/
+**/_cache/
+TranslationReview/
+source-terms.json
+translations.json
+_translate.json
+*.log
+*.dmp
+*.tmp
+*.download
+
+# Do not commit runtime dependencies or proprietary game binaries
+BepInEx/
+WarhammerSurvivors_Data/
+*.dll
+*.exe
+*.pdb
+*.zip
+*.ttf
+*.otf
+*.assets
+
+# Local editor and OS files
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+.DS_Store
+Thumbs.db

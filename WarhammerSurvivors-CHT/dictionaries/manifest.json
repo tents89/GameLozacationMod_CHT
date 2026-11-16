@@ -1,0 +1,57 @@
+{
+  "repository": "https://github.com/BYVoid/OpenCC",
+  "tag": "ver.1.1.9",
+  "commit": "556ed22496d650bd0b13b6c163be9814637970ae",
+  "files": {
+    "STCharacters.txt": {
+      "upstream": "data/dictionary/STCharacters.txt",
+      "sha256": "ed1d268e0ad028511dcf5b0089faed0a980ad332449ec11d481ceefde6879f41",
+      "bytes": 34353
+    },
+    "STPhrases.txt": {
+      "upstream": "data/dictionary/STPhrases.txt",
+      "sha256": "17fece21a28f3db2dc32397abd73d21ae73261c3f295fa6a3fe64b5e8d8b554b",
+      "bytes": 1004897
+    },
+    "TWVariants.txt": {
+      "upstream": "data/dictionary/TWVariants.txt",
+      "sha256": "30e6f8395edbfdd74e293fd8b9c62105d787c849fbb208d2a7832eac696734d7",
+      "bytes": 312
+    },
+    "TWPhrasesIT.txt": {
+      "upstream": "data/dictionary/TWPhrasesIT.txt",
+      "sha256": "3a4a2ad207f3a9442eb8f399630cf982c2ffc561df9c58b2ee352cfa023915c1",
+      "bytes": 7659
+    },
+    "TWPhrasesName.txt": {
+      "upstream": "data/dictionary/TWPhrasesName.txt",
+      "sha256": "76e643569a30ea54e7ab6e52621fd4c396e01ee6dc2d15b7d25bf23addf4438a",
+      "bytes": 2121
+    },
+    "TWPhrasesOther.txt": {
+      "upstream": "data/dictionary/TWPhrasesOther.txt",
+      "sha256": "6d0365fd180283f3e14b44f63d19d1aca045d60b0e000765902ad889a90d7a33",
+      "bytes": 623
+    },
+    "LICENSE.OpenCC": {
+      "upstream": "LICENSE",
+      "sha256": "b534e465949558eec2597b04f5092b5e161236a68dfbfd04d547592ac3964308",
+      "bytes": 9165
+    },
+    "s2t.json": {
+      "upstream": "data/config/s2t.json",
+      "sha256": "710bb970e406d9c0a3dd33c609248686cf1c5578d064b7b7fc89e70fbb9ea75d",
+      "bytes": 406
+    },
+    "s2tw.json": {
+      "upstream": "data/config/s2tw.json",
+      "sha256": "67ce1f5aa3d6b21ebb523084b40e66f80bec27bb2dc6b540d44dac2e27f7194e",
+      "bytes": 505
+    },
+    "s2twp.json": {
+      "upstream": "data/config/s2twp.json",
+      "sha256": "72d187574510542be608c862d5359d29480ee61f137082df8a06d74f7bcfc79c",
+      "bytes": 599
+    }
+  }
+}

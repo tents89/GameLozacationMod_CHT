@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>WarhammerSurvivors.TraditionalChinese</AssemblyName>
+    <RootNamespace>WarhammerSurvivors.TraditionalChinese</RootNamespace>
+    <Version>1.0.0</Version>
+    <GameRoot Condition="'$(GameRoot)' == ''">$(MSBuildThisFileDirectory)..\..\..</GameRoot>
+    <BepInExRoot>$(GameRoot)\BepInEx</BepInExRoot>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="BepInEx.Core"><HintPath>$(BepInExRoot)\core\BepInEx.Core.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="BepInEx.Unity.IL2CPP"><HintPath>$(BepInExRoot)\core\BepInEx.Unity.IL2CPP.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="0Harmony"><HintPath>$(BepInExRoot)\core\0Harmony.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Il2CppInterop.Runtime"><HintPath>$(BepInExRoot)\core\Il2CppInterop.Runtime.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Il2CppInterop.Common"><HintPath>$(BepInExRoot)\core\Il2CppInterop.Common.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Il2Cppmscorlib"><Aliases>Il2Cpp</Aliases><HintPath>$(BepInExRoot)\interop\Il2Cppmscorlib.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="l2localization"><HintPath>$(BepInExRoot)\interop\l2localization.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.CoreModule"><HintPath>$(BepInExRoot)\interop\UnityEngine.CoreModule.dll</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+  <Target Name="CheckInterop" BeforeTargets="ResolveReferences">
+    <Error Condition="!Exists('$(BepInExRoot)\interop\l2localization.dll')" Text="I2 interop DLL missing. Launch the game with BepInEx IL2CPP once, or set -p:GameRoot=..." />
+  </Target>
+  <ItemGroup>
+    <None Include="..\..\THIRD_PARTY_NOTICES.md" Link="THIRD_PARTY_NOTICES.md" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+  <Import Project="..\..\EmbeddedOpenCc.props" />
+</Project>
+
+
