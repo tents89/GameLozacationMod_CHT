@@ -17,7 +17,7 @@ public sealed class Plugin : BasePlugin
 {
     public const string Id = "local.warhammersurvivors.traditionalchinese";
     public const string Name = "Warhammer Survivors Traditional Chinese";
-    public const string Version = "1.3.1";
+    public const string Version = "1.0.0";
     internal static Plugin? Instance;
     private BulkI2Localization? bulk;
     private Harmony? harmony;

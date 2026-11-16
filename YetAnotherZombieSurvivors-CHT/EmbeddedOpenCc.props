@@ -1,0 +1,10 @@
+﻿<Project>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)dictionaries\*">
+      <LogicalName>TraditionalChinese.OpenCC.%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)glossary\post-overrides.tsv">
+      <LogicalName>TraditionalChinese.OpenCC.post-overrides.tsv</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+</Project>

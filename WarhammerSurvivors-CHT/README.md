@@ -4,11 +4,11 @@
 
 <img src="image/test.png" style="display: block; margin: 0 auto;">
 
-## 適用環境
+## 測試環境
 
 - **平台**：Windows
 - **框架**：BepInEx 6 IL2CPP（BepInEx 前沿版本 #785）
-- **測試的遊戲版本**：2.1.6
+- **遊戲版本**：2.1.6
 - **遊戲語系**：需設定為「簡體中文」
 
 ## 功能

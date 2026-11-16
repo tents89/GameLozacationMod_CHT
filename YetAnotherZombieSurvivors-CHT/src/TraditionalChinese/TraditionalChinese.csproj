@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>YetAnotherZombieSurvivors.TraditionalChinese</AssemblyName>
+    <RootNamespace>YetAnotherZombieSurvivors.TraditionalChinese</RootNamespace>
+    <Version>1.0.6</Version>
+    <GameRoot Condition="'$(GameRoot)' == ''">F:\SteamLibrary\steamapps\common\Yet Another Zombie Survivors</GameRoot>
+    <BepInExRoot>$(GameRoot)\BepInEx</BepInExRoot>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="BepInEx.Core"><HintPath>$(BepInExRoot)\core\BepInEx.Core.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="BepInEx.Unity.IL2CPP"><HintPath>$(BepInExRoot)\core\BepInEx.Unity.IL2CPP.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Il2CppInterop.Runtime"><HintPath>$(BepInExRoot)\core\Il2CppInterop.Runtime.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Il2CppInterop.Common"><HintPath>$(BepInExRoot)\core\Il2CppInterop.Common.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Il2Cppmscorlib"><Aliases>Il2Cpp</Aliases><HintPath>$(BepInExRoot)\interop\Il2Cppmscorlib.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Assembly-CSharp"><HintPath>$(BepInExRoot)\interop\Assembly-CSharp.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.ImageConversionModule"><HintPath>$(BepInExRoot)\interop\UnityEngine.ImageConversionModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.UI"><HintPath>$(BepInExRoot)\interop\UnityEngine.UI.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Unity.TextMeshPro"><HintPath>$(BepInExRoot)\interop\Unity.TextMeshPro.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.TextRenderingModule"><HintPath>$(BepInExRoot)\interop\UnityEngine.TextRenderingModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.TextCoreFontEngineModule"><HintPath>$(BepInExRoot)\interop\UnityEngine.TextCoreFontEngineModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.CoreModule"><HintPath>$(BepInExRoot)\interop\UnityEngine.CoreModule.dll</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\Font\NotoSansTC.json" LogicalName="TraditionalChinese.Font.NotoSansTC.json" />
+    <EmbeddedResource Include="..\..\Font\NotoSansTC.png" LogicalName="TraditionalChinese.Font.NotoSansTC.png" />
+    <EmbeddedResource Include="..\..\Font\fallback\LICENSE.OFL" LogicalName="TraditionalChinese.Font.LICENSE.OFL" />
+  </ItemGroup>
+  <Target Name="CheckInterop" BeforeTargets="ResolveReferences">
+    <Error Condition="!Exists('$(BepInExRoot)\interop\Assembly-CSharp.dll')" Text="I2 interop DLL missing. Launch the game with BepInEx IL2CPP once, or set -p:GameRoot=..." />
+  </Target>
+  <ItemGroup>
+    <None Include="..\..\Font\fallback\NotoSans.ttf" Link="_font\NotoSans.ttf" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\THIRD_PARTY_NOTICES.md" Link="THIRD_PARTY_NOTICES.md" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+  <Import Project="..\..\EmbeddedOpenCc.props" />
+</Project>
+
+
