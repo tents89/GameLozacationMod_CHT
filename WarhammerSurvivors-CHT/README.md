@@ -2,6 +2,8 @@
 
 將遊戲內的簡體中文轉成繁體中文（使用 OpenCC S2TW 與內嵌自訂詞彙）。
 
+<img src="image/test.png" style="display: block; margin: 0 auto;">
+
 ## 適用環境
 
 - **平台**：Windows
