@@ -1,4 +1,4 @@
-﻿# YetAnotherZombieSurvivors 繁體中文模組
+﻿# Yet Another Zombie Survivors 繁體中文模組
 
 將遊戲內的簡體中文轉成繁體中文（使用 OpenCC S2TW 與內嵌自訂詞彙）。
 
